@@ -184,7 +184,6 @@ const demoProductImages = [
   },
 ];
 
-
 const demoCategories = [
   {
     name: "speakers",
@@ -227,6 +226,21 @@ const demoCategories = [
   },
 ];
 
+const users = [
+  {
+    id: "2Li_TxdkihdWRZcDr7ZCG",
+    email: "foo@mail.com",
+    password: "$2a$14$Hy61bqH3/qyq2VsTjjDmwe/3QwHwXgxOxabflKHOS/SgvLbM8vwCu", // Admin123!
+    role: "admin",
+  },
+  {
+    id: "NPLEja-FDsZ_kitlCVn7x",
+    email: "bar@mail.com",
+    password: "$2a$14$wq3ukm0ouJ/lGpix4VZ/UuMkGBFP0V4igx8LB/ZKdSpdT5qbZrCQq", // Admin123!
+    role: "user",
+  },
+];
+
 async function insertDemoData() {
   for (const product of demoProducts) {
     await prisma.product.create({
@@ -248,6 +262,13 @@ async function insertDemoData() {
     });
   }
   console.log("Demo categories inserted successfully!");
+
+  for (const user of users) {
+    await prisma.user.create({
+      data: user,
+    });
+  }
+  console.log("Demo users inserted successfully!");
 }
 
 insertDemoData()
