@@ -27,6 +27,7 @@ model Product {
   category       Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   customerOrders customer_order_product[]
   Wishlist       Wishlist[]
+  reviews        Review[]
 }
 
 model Image {
@@ -41,6 +42,7 @@ model User {
   password String?
   role     String?    @default("user")
   Wishlist Wishlist[]
+  reviews  Review[] 
 }
 
 model Customer_order {
@@ -83,4 +85,18 @@ model Wishlist {
   productId String
   user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  rating    Int      // 1-5 stars
+  comment   String   
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  productId String
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([productId, userId]) // One review per user per product
 }

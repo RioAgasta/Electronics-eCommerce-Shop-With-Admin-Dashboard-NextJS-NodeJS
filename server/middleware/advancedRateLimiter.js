@@ -92,10 +92,28 @@ const createDynamicLimiter = (windowMs, max, message) => {
   });
 };
 
+const reviewsLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 menit
+  max: 15, // Maksimal 15 operasi review dalam 10 menit
+  message: {
+    error: 'Terlalu banyak operasi review, silakan coba lagi nanti.',
+    retryAfter: '10 menit'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    res.status(429).json({
+      error: 'Terlalu banyak operasi review, silakan coba lagi nanti.',
+      retryAfter: '10 menit'
+    });
+  }
+});
+
 module.exports = {
   passwordResetLimiter,
   adminLimiter,
   wishlistLimiter,
   productLimiter,
+  reviewsLimiter, 
   createDynamicLimiter
 };

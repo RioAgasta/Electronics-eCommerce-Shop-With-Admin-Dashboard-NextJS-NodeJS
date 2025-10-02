@@ -11,6 +11,8 @@ const orderRouter = require("./routes/customer_orders");
 const slugRouter = require("./routes/slugs");
 const orderProductRouter = require('./routes/customer_order_product');
 const wishlistRouter = require('./routes/wishlist');
+const reviewsRouter = require('./routes/reviews');
+
 var cors = require("cors");
 
 // Import logging middleware
@@ -36,7 +38,8 @@ const {
   passwordResetLimiter,
   adminLimiter,
   wishlistLimiter,
-  productLimiter
+  productLimiter,
+  reviewsLimiter 
 } = require('./middleware/advancedRateLimiter');
 
 const {
@@ -125,6 +128,7 @@ app.use("/api/orders", orderRouter);
 app.use('/api/order-product', orderProductRouter);
 app.use("/api/slugs", slugRouter);
 app.use("/api/wishlist", wishlistRouter);
+app.use('/api/reviews', reviewsRouter);
 
 // Health check endpoint (no rate limiting)
 app.get('/health', (req, res) => {
