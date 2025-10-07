@@ -8,6 +8,7 @@ import {
 } from "@/components";
 import apiClient from "@/lib/api";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
 import { FaSquareFacebook } from "react-icons/fa6";
@@ -76,6 +77,12 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
             <SingleProductDynamicFields product={product} />
             <div className="flex flex-col gap-y-2 max-[500px]:items-center">
               <AddToWishlistBtn product={product} slug={paramsAwaited.productSlug} />
+              <Link
+                href={`/product/${paramsAwaited.productSlug}/review`}
+                className="flex justify-center items-center w-full uppercase bg-blue-600 px-0 py-2 text-base border border-blue-600 font-bold text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <p>Write a Review</p>
+              </Link>
               <p className="text-lg">
                 SKU: <span className="ml-1">abccd-18</span>
               </p>
