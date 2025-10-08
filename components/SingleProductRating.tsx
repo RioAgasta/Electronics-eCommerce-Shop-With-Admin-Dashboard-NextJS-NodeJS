@@ -1,5 +1,5 @@
 // *********************
-// Role of the component: Rating stars component that will display stars on the single product page 
+// Role of the component: Rating stars component that will display stars on the single product page
 // Name of the component: SingleProductRating.tsx
 // Developer: Aleksandar Kuzmanovic
 // Version: 1.0
@@ -11,7 +11,15 @@
 import React from "react";
 import { AiFillStar, AiOutlineStar } from "react-icons/ai";
 
-const SingleProductRating = ({ rating }: { rating: number }) => {
+interface SingleProductRatingProps {
+  rating: number;
+  numberReviews: number;
+}
+
+const SingleProductRating = ({
+  rating,
+  numberReviews = 0,
+}: SingleProductRatingProps) => {
   const ratingArray: Array<string> = [
     "empty star",
     "empty star",
@@ -29,16 +37,18 @@ const SingleProductRating = ({ rating }: { rating: number }) => {
       {ratingArray &&
         ratingArray.map((singleRating, key: number) => {
           return (
-            <div key={key+"rating"}>
+            <div key={key + "rating"}>
               {singleRating === "full star" ? (
                 <AiFillStar className="text-custom-yellow" />
+              ) : !numberReviews || numberReviews === 0 ? (
+                <AiOutlineStar className="text-custom-grey text-gray-400" />
               ) : (
                 <AiOutlineStar className="text-custom-yellow" />
               )}
             </div>
           );
         })}
-      <span className="text-xl ml-1">(3 reviews)</span>
+      <span className="text-xl ml-1">({numberReviews} reviews)</span>
     </div>
   );
 };

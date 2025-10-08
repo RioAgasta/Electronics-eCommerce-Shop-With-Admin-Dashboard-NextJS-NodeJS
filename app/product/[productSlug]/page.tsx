@@ -16,6 +16,26 @@ import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaSquarePinterest } from "react-icons/fa6";
 import { sanitize } from "@/lib/sanitize";
 
+interface Review {
+  id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  user: {
+    id: string;
+    email: string;
+  };
+}
+
+interface ReviewsResponse {
+  reviews: Review[];
+  pagination: {
+    current: number;
+    total: number;
+    count: number;
+  };
+}
+
 interface ImageItem {
   imageID: string;
   productID: string;
@@ -23,25 +43,47 @@ interface ImageItem {
 }
 
 interface SingleProductPageProps {
-  params: Promise<{  productSlug: string, id: string }>;
+  params: Promise<{ productSlug: string; id: string }>;
 }
 
 const SingleProductPage = async ({ params }: SingleProductPageProps) => {
   const paramsAwaited = await params;
   // sending API request for a single product with a given product slug
-  const data = await apiClient.get(
-    `/api/slugs/${paramsAwaited?.productSlug}`
-  );
+  const data = await apiClient.get(`/api/slugs/${paramsAwaited?.productSlug}`);
   const product = await data.json();
 
   // sending API request for more than 1 product image if it exists
-  const imagesData = await apiClient.get(
-    `/api/images/${paramsAwaited?.id}`
-  );
+  const imagesData = await apiClient.get(`/api/images/${paramsAwaited?.id}`);
   const images = await imagesData.json();
 
   if (!product || product.error) {
     notFound();
+  }
+
+  // Fetch reviews to calculate average rating
+  let averageRating = 0;
+  let reviewsCount = 0;
+  try {
+    const reviewsResponse = await apiClient.get(
+      `/api/reviews/product/${product.id}`,
+    );
+
+    if (reviewsResponse.ok) {
+      const reviewsData: ReviewsResponse = await reviewsResponse.json();
+      const reviews = reviewsData.reviews;
+      reviewsCount = reviews.length;
+
+      if (reviews && reviews.length > 0) {
+        const totalRating = reviews.reduce(
+          (sum, review) => sum + review.rating,
+          0,
+        );
+        averageRating = totalRating / reviews.length;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching reviews for rating calculation:", error);
+    // averageRating remains 0 as default
   }
 
   return (
@@ -50,7 +92,11 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
         <div className="flex justify-center gap-x-16 pt-10 max-lg:flex-col items-center gap-y-5 px-5">
           <div>
             <Image
-              src={product?.mainImage ? `/${product?.mainImage}` : "/product_placeholder.jpg"}
+              src={
+                product?.mainImage
+                  ? `/${product?.mainImage}`
+                  : "/product_placeholder.jpg"
+              }
               width={500}
               height={500}
               alt="main image"
@@ -70,13 +116,19 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
             </div>
           </div>
           <div className="flex flex-col gap-y-7 text-black max-[500px]:text-center">
-            <SingleProductRating rating={product?.rating} />
+            <SingleProductRating
+              rating={averageRating}
+              numberReviews={reviewsCount}
+            />
             <h1 className="text-3xl">{sanitize(product?.title)}</h1>
             <p className="text-xl font-semibold">${product?.price}</p>
             <StockAvailabillity stock={94} inStock={product?.inStock} />
             <SingleProductDynamicFields product={product} />
             <div className="flex flex-col gap-y-2 max-[500px]:items-center">
-              <AddToWishlistBtn product={product} slug={paramsAwaited.productSlug} />
+              <AddToWishlistBtn
+                product={product}
+                slug={paramsAwaited.productSlug}
+              />
               <Link
                 href={`/product/${paramsAwaited.productSlug}/review`}
                 className="flex justify-center items-center w-full uppercase bg-blue-600 px-0 py-2 text-base border border-blue-600 font-bold text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
