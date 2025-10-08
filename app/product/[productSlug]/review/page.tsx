@@ -144,18 +144,12 @@ const ProductReviewPage = ({ params }: ProductReviewPageProps) => {
 		setError('');
 
 		try {
-			const response = await fetch('/api/reviews/', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					userId: session.user.email,
-					productId: product.id,
-					rating: rating,
-					comment: reviewText.trim(),
-				}),
-			});
+      const response = await apiClient.post(`/api/reviews`, {
+        userId: user?.id,
+        productId: product.id,
+        rating: rating,
+        comment: reviewText.trim(),
+      });
 
 			const data = await response.json();
 
