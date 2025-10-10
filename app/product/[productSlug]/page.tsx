@@ -15,6 +15,8 @@ import { FaSquareFacebook } from "react-icons/fa6";
 import { FaSquareXTwitter } from "react-icons/fa6";
 import { FaSquarePinterest } from "react-icons/fa6";
 import { sanitize } from "@/lib/sanitize";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 interface Review {
   id: string;
@@ -59,6 +61,9 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
   if (!product || product.error) {
     notFound();
   }
+
+  // Check if user is logged in
+  const session = await getServerSession(authOptions);
 
   // Fetch reviews to calculate average rating
   let averageRating = 0;
@@ -129,12 +134,14 @@ const SingleProductPage = async ({ params }: SingleProductPageProps) => {
                 product={product}
                 slug={paramsAwaited.productSlug}
               />
-              <Link
-                href={`/product/${paramsAwaited.productSlug}/review`}
-                className="flex justify-center items-center w-full uppercase bg-blue-600 px-0 py-2 text-base border border-blue-600 font-bold text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <p>Write a Review</p>
-              </Link>
+              {session ? (
+                <Link
+                  href={`/product/${paramsAwaited.productSlug}/review`}
+                  className="flex justify-center items-center w-full uppercase bg-blue-600 px-0 py-2 text-base border border-blue-600 font-bold text-white shadow-sm hover:bg-blue-700 hover:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <p>Write a Review</p>
+                </Link>
+              ) : null}
               <p className="text-lg">
                 SKU: <span className="ml-1">abccd-18</span>
               </p>
